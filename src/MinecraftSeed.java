@@ -24,10 +24,25 @@ public class MinecraftSeed implements ActionListener {
 	private int validNames;
 	private JComboBox combo;
 	
-	private final Double version = 1.3;
+	private final Double version = 1.4;
 	
 	public MinecraftSeed()
 	{
+		//Set the system look and feel
+		
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		}
+		
+		
 		//Windows
 		if(System.getProperty("os.name").toLowerCase().contains("windows"))
 		{
