@@ -261,8 +261,8 @@ public class MinecraftSeed implements ActionListener {
 			if(cmd.equals("about"))
 			{
 				String message = "Written by Chris Iverson. \n\n" +
-								 "Source code for this program available on request.\n" +
-								 "Send e-mail to cj.no.one@gmail.com.";
+								 "Source code available here:\n" +
+								 "https://github.com/thedarkfreak/Minecraft-Save-Seed-Reader";
 				
 				JOptionPane.showMessageDialog(panel, message, "About Minecraft Save Seed Reader v" + version.toString(),
 						JOptionPane.INFORMATION_MESSAGE);
