@@ -11,7 +11,7 @@ class DirFilter implements FilenameFilter {
 	public boolean accept(File dir, String name) {
 		return new File(dir.getPath() + File.separator + name).isDirectory();
 	}
-
+	
 }
 
 public class MinecraftSeed implements ActionListener {
@@ -24,7 +24,7 @@ public class MinecraftSeed implements ActionListener {
 	private int validNames;
 	private JComboBox combo;
 	
-	private final Double version = 1.2;
+	private final Double version = 1.3;
 	
 	public MinecraftSeed()
 	{
@@ -96,7 +96,28 @@ public class MinecraftSeed implements ActionListener {
 	
 	public static void main(String[] args) {
 
-		new MinecraftSeed();
+		try {
+			new MinecraftSeed();
+			
+		} catch(Exception e) {  //If anything unexpected goes wrong in the main program,
+								//write it to an error log
+			try {
+				FileOutputStream fos = new FileOutputStream("MinecraftSeed.error.log");
+				e.printStackTrace(new PrintStream(fos));
+				fos.close();
+				
+				JOptionPane.showMessageDialog(null, "An error occured." +
+						"\nCheck the MinecraftSeed.error.log file for more information.", 
+						"ERROR", JOptionPane.ERROR_MESSAGE);
+				
+			} catch (FileNotFoundException e1) {  //If the error log messes up,
+												  //fall back to console
+				e.printStackTrace();
+			} catch (IOException e2) {
+				e.printStackTrace();
+			}
+			
+		}
 		
 	}
 
@@ -133,7 +154,15 @@ public class MinecraftSeed implements ActionListener {
 							main = Tag.readFrom(fis);
 							fis.close();
 							
-							combo.addItem((String)main.findTagByName("LevelName").getValue());
+							//If the level.dat doesn't have a 'LevelName' entry,
+							//go by the folder's name
+							Tag name = main.findTagByName("LevelName");
+							if(name == null) {
+								combo.addItem(file.getParentFile().getName());
+							} else {
+								combo.addItem((String)name.getValue());								
+							}
+
 						} catch (FileNotFoundException e) {
 							e.printStackTrace();
 						} catch (IOException e) {
@@ -184,6 +213,7 @@ public class MinecraftSeed implements ActionListener {
 			JComboBox cb = (JComboBox)arg0.getSource();
 			int val = cb.getSelectedIndex();
 			
+			//Make sure something was actually chosen
 			if(val > -1)
 			{
 				try {
