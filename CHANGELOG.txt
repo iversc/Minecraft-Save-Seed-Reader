@@ -1,0 +1,42 @@
+===============================================================
+Version 1.4 -
+===============================================================
+
+Minor tweaks. Made the GUI use the look and feel of the current system instead of Java's default look and feel, which makes it look better no matter the platform you're on.
+
+Also modified the 'About' menu text to include the github site for the source code.
+
+===============================================================
+Version 1.3 -
+===============================================================
+
+Fixed a NullPointerException happening when searching for save files.  The program originally used the contents of the "LevelName" tag in the save file as the world's name in the dropdown list.  However, it turned out that older saves didn't have the "LevelName" tag, so trying to use it resulted in a NullPointerException.
+
+As a fix, the program now checks if it can find a "LevelName" tag, and if it can't, it uses the name of the folder that the save file is in as the world name. (For example, if you have a save at .minecraft\saves\World1, which doesn't have a "LevelName" tag, it will use World1 as the world name.)
+
+===============================================================
+Version 1.2 -
+===============================================================
+
+Modified the GUI to use a dropdown list instead of a button.  The program will automatically search the default save directory for save files, and add them to the dropdown list.  Choose a save from the dropdown list to get that world's seed.
+
+The directory it searches for saves in can be selected by the user by choosing Help -> Select MC Save Folder from the menu.
+
+You will get a notice if the folder you select doesn't exist or if the folder you select doesn't appear to have any valid MC saves in it.  In that case, it will ask you to choose again.
+
+===============================================================
+Version 1.1 - 
+===============================================================
+
+Modified the loading routine to automatically open the folder selection dialog in the default Minecraft saves folder, depending on the OS running.
+
+For Windows, it opens the dialog at %APPDATA%\.minecraft\saves\
+For Mac OS X, it opens the dialog at 
+	/users/<name>/Library/Application Support/minecraft/saves/
+For Linux, it opens the dialog at ~/.minecraft/saves/.
+
+===============================================================
+Version 1.0 - 
+===============================================================
+
+First Release
