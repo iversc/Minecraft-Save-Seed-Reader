@@ -226,9 +226,9 @@ public class MinecraftSeed implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		//If a combobox item was selected
-		if(arg0.getSource() instanceof JComboBox) {
-			JComboBox cb = (JComboBox)arg0.getSource();
-			int val = cb.getSelectedIndex();
+		if(arg0.getSource() == combo)
+		{
+			int val = combo.getSelectedIndex();
 			
 			//Make sure something was actually chosen
 			if(val > -1)
@@ -264,7 +264,10 @@ public class MinecraftSeed implements ActionListener {
 			{
 				String message = "Written by Chris Iverson. \n\n" +
 								 "Source code available here:\n" +
-								 "https://github.com/thedarkfreak/Minecraft-Save-Seed-Reader";
+								 "https://github.com/thedarkfreak/Minecraft-Save-Seed-Reader\n" +
+								 "\nProblems? \nReport them either to the github site, in the forum topic,\n" +
+								 "or send me an e-mail at cj.no.one@gmail.com.\n" +
+								 "\nEnjoy!";
 				
 				JOptionPane.showMessageDialog(panel, message, "About Minecraft Save Seed Reader v" + version.toString(),
 						JOptionPane.INFORMATION_MESSAGE);
