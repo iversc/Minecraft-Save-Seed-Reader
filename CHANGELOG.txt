@@ -14,6 +14,8 @@ Fixed a NullPointerException happening when searching for save files.  The progr
 
 As a fix, the program now checks if it can find a "LevelName" tag, and if it can't, it uses the name of the folder that the save file is in as the world name. (For example, if you have a save at .minecraft\saves\World1, which doesn't have a "LevelName" tag, it will use World1 as the world name.)
 
+Also, added an error handling mechanism that will notify the user that an error has occured, and create an error log, named MinecraftSeed.error.log.  This will prevent it from failing silenty while it outputs the error information to a usually invisible console.  If it can't open the error log file, it will fall back to outputting to the console.
+
 ===============================================================
 Version 1.2 -
 ===============================================================
