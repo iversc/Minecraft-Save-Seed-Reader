@@ -145,6 +145,7 @@ public class MinecraftSeed implements ActionListener {
 		//Check to reload data, used when checking folders with no valid save files
 		do {
 			loop = false;
+			
 			File file = new File(savePath);
 			
 			//If the save folder selected actually exists
@@ -218,6 +219,23 @@ public class MinecraftSeed implements ActionListener {
 		int ret = fc.showDialog(panel, "Open Minecraft Saves Folder");
 		if(ret == JFileChooser.APPROVE_OPTION) {
 			savePath = fc.getSelectedFile().getPath();
+			
+			//Three tests to see if the folder chosen was a world folder, not the saves folder
+			//Test one: check for existence of 'level.dat'
+			if((new File(savePath + File.separator + "level.dat")).exists())
+			{
+				//'level.dat' exists, now check for 'session.lock'
+				if((new File(savePath + File.separator + "session.lock")).exists())
+				{
+					//'session.lock' exists, now the final check: region subfolder.
+					if((new File(savePath + File.separator + "region")).exists())
+					{
+						//At this point, we've almost indisputably gotten a world folder instead
+						//of the saves folder.  Let's set 'savePath' to the parent directory.
+						savePath = new File(savePath).getParent();
+					}
+				}
+			}
 			return true;
 		}
 		

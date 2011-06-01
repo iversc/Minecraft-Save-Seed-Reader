@@ -5,10 +5,7 @@ Minecraft Save Seed Reader
 
 This program reads and displays the seed from all found minecraft Save files.   Just select a world's name from the dropdown list that shows up to get that world's seed.
 
-If you do not see your save files, or if you get an error stating the saves aren't found, try locating the Minecraft saves folder manually, either in the popup or by opening the Help menu and choosing "Select MC Save Location".   Do NOT use the folder containing the level.dat file; (i.e. if your world is named World1, do NOT choose the World1 folder).   Instead, choose the folder that THAT folder is in(in our example, choose the folder that World1 is in).
-
-
-
+If you do not see your save files, or if you get an error stating the saves aren't found, try locating the Minecraft saves folder manually, either in the popup or by opening the Help menu and choosing "Select MC Save Location".  You have to select the 'saves' folder, not any of the world folders in the 'saves' folder.
 
 
 
@@ -29,4 +26,4 @@ Next, it looks into each sub-folder it finds in the .minecraft/saves/ folder, an
 
 When a world is selected from the dropdown list, it looks up the RandomSeed tag from that folder's level.dat file.
 
-If you choose a save folder manually, it searches the sub-folders of the folder you chose, which is why you need to choose the folder that holds the sub-folders, not the folder that holds a level.dat file.
+If you choose a save folder manually, it first checks the folder you choose for the existence of 'level.dat', 'session.lock', and the 'region' folder.  If it finds all three, it guesses that the user chose a world folder instead, and searches the parent folder for other saves.
