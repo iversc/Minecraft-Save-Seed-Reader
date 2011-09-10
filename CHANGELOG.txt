@@ -1,10 +1,23 @@
 ===============================================================
+Version 1.5 -
+===============================================================
+
+Added the ability to toggle 1.8+ worlds between Creative and
+Survival mode.
+
+Also fixed a bug in the Tag class, that prevented TAG_Compound
+entries from being modified correctly.
+
+===============================================================
 Version 1.4 -
 ===============================================================
 
-Minor tweaks. Made the GUI use the look and feel of the current system instead of Java's default look and feel, which makes it look better no matter the platform you're on.
+Minor tweaks. Made the GUI use the look and feel of the current
+system instead of Java's default look and feel, which makes it
+look better no matter the platform you're on.
 
-Also modified the 'About' menu text to include the github site for the source code.
+Also modified the 'About' menu text to include the github site
+for the source code.
 
 Changed behavior of folder selection dialog; now, it runs three checks after a folder has been chosen.  In the folder chosen, it checks for the existence of 'level.dat', 'session.lock', and the 'region' folder.  If all three exist, the folder chosen is most likely a world folder instead of the saves folder required, so the program automatically sets the chosen path to the parent folder.  Let me know if any problems come from this.
 

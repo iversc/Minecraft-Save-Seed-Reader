@@ -5,6 +5,8 @@ Minecraft Save Seed Reader
 
 This program reads and displays the seed from all found minecraft Save files.   Just select a world's name from the dropdown list that shows up to get that world's seed.
 
+If the save file is a 1.8+ save file, you can switch the world between Creative and Survival mode by checking the box and hitting 'Save'.
+
 If you do not see your save files, or if you get an error stating the saves aren't found, try locating the Minecraft saves folder manually, either in the popup or by opening the Help menu and choosing "Select MC Save Location".  You have to select the 'saves' folder, not any of the world folders in the 'saves' folder.
 
 

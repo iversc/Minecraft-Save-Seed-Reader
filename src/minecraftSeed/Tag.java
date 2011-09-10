@@ -150,7 +150,14 @@ public class Tag {
 		if (type != Type.TAG_List && type != Type.TAG_Compound)
 			throw new RuntimeException();
 		Tag[] subtags = (Tag[]) value;
-		insertTag(tag, subtags.length);
+		
+		int index = subtags.length;
+		
+		//For TAG_Compund entries, we need to add the tag BEFORE the end,
+		//or the new tag gets placed after the TAG_End, messing up the data.
+		//TAG_End MUST be kept at the very end of the TAG_Compound.
+		if(type == Type.TAG_Compound) index--;
+		insertTag(tag, index);
 	}
 
 	/**

@@ -1,11 +1,11 @@
 package minecraftSeed;
 
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 
 import javax.swing.*;
+import net.miginfocom.swing.MigLayout;
 
 class DirFilter implements FilenameFilter {
 
@@ -25,8 +25,12 @@ public class MinecraftSeed implements ActionListener {
 	private String[] filePaths;
 	private int validNames;
 	private JComboBox combo;
+	private JCheckBox cbCreative;
+	private boolean creativeEnabled;
+	private JButton btnSave;
+	private String selectedFilePath;
 	
-	private final Double version = 1.4;
+	private final Double version = 1.5;
 	
 	public MinecraftSeed()
 	{
@@ -68,7 +72,6 @@ public class MinecraftSeed implements ActionListener {
 		
 		
 		panel = new JPanel();
-		panel.setLayout(new FlowLayout());
 		
 		combo = new JComboBox();
 		combo.addActionListener(this);
@@ -76,7 +79,6 @@ public class MinecraftSeed implements ActionListener {
 		text = new JTextField();
 		text.setColumns(20);
 		
-		setupData();
 		
 		JMenuBar menuBar = new JMenuBar();
 		JMenu helpMenu = new JMenu("Help");
@@ -100,10 +102,26 @@ public class MinecraftSeed implements ActionListener {
 		
 		menuBar.add(helpMenu);
 		frame.setJMenuBar(menuBar);
+		panel.setLayout(new MigLayout("", "[28px][166px][95px]", "[23px][]"));
 		
-		panel.add(combo);
-		panel.add(text);
+		panel.add(combo, "cell 0 0,alignx left,aligny center");
+		panel.add(text, "cell 1 0 2 1,growx");
 		frame.getContentPane().add(panel);
+		
+		cbCreative = new JCheckBox("Creative Mode");
+		cbCreative.setEnabled(false);
+		cbCreative.setActionCommand("creativetoggle");
+		cbCreative.addActionListener(this);
+		panel.add(cbCreative, "flowx,cell 1 1,alignx left,aligny top");
+		
+		btnSave = new JButton("Save Changes");
+		btnSave.setEnabled(false);
+		btnSave.setActionCommand("save");
+		btnSave.addActionListener(this);
+		panel.add(btnSave, "cell 2 1");
+		
+		setupData();
+		
 		frame.pack();
 		
 		//Center on screen
@@ -117,7 +135,7 @@ public class MinecraftSeed implements ActionListener {
 			new MinecraftSeed();
 			
 		} catch(Exception e) {  //If anything unexpected goes wrong in the main program,
-								//write it to an error log
+			     				//write it to an error log
 			try {
 				FileOutputStream fos = new FileOutputStream("MinecraftSeed.error.log");
 				e.printStackTrace(new PrintStream(fos));
@@ -133,7 +151,7 @@ public class MinecraftSeed implements ActionListener {
 			} catch (IOException e2) {
 				e.printStackTrace();
 			}
-			
+			e.printStackTrace();
 		}
 		
 	}
@@ -180,7 +198,7 @@ public class MinecraftSeed implements ActionListener {
 							} else {
 								combo.addItem((String)name.getValue());								
 							}
-
+							
 						} catch (FileNotFoundException e) {
 							e.printStackTrace();
 						} catch (IOException e) {
@@ -251,19 +269,40 @@ public class MinecraftSeed implements ActionListener {
 			//Make sure something was actually chosen
 			if(val > -1)
 			{
+				//Disable the save button
+				btnSave.setEnabled(false);
+				
 				try {
-					FileInputStream fis = new FileInputStream(new File(filePaths[val]));
+					selectedFilePath = filePaths[val];
+					FileInputStream fis = new FileInputStream(new File(selectedFilePath));
 					main = Tag.readFrom(fis);
 					fis.close();
 					
 					text.setText(main.findTagByName("RandomSeed").getValue().toString());
+					
+					//Only if the save file has a 'GameType' entry will
+					//we allow the user to switch between Creative on and off.
+					Tag creative = main.findTagByName("GameType");
+					if(creative==null)
+					{
+						cbCreative.setEnabled(false);
+					}
+					else
+					{
+						cbCreative.setEnabled(true);
+						
+						//Check the box if creative is enabled
+						creativeEnabled = ((Integer)creative.getValue() == 1);
+						cbCreative.setSelected(creativeEnabled);
+					}
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-		} else { //One of the menu items was chosen
+		} else { //One of the menu items was chosen, or the checkbox was checked,
+			     //or "save" was pressed
 			String cmd = arg0.getActionCommand();
 			
 			//"How to use" menu item
@@ -272,7 +311,10 @@ public class MinecraftSeed implements ActionListener {
 				String message = "Choose the world's name from the dropdown list." +
 								 "\nThe world's seed will show up in the textbox." + 
 								 "\n\nIf the list is empty, click on Help > Select MC Save Folder," +
-								 "\nand find and open the saves folder in the file chooser.";
+								 "\nand find and open the saves folder in the file chooser.\n" +
+								 "\nIf the save is a version 1.8+ save, you can switch the world" +
+								 "\nbetween Creative and Survival by checking the checkbox, then" +
+								 "\nhitting Save.";
 				
 				JOptionPane.showMessageDialog(panel, message, "How to Use", JOptionPane.INFORMATION_MESSAGE);
 			}
@@ -297,8 +339,50 @@ public class MinecraftSeed implements ActionListener {
 				//Only load the data if the user selected a folder
 				if(chooseSaveFolder()) setupData();
 			}
-		}
+			
+			//Checkbox checked
+			if(cmd.equals("creativetoggle"))
+			{
+				//File manipulation here
+				creativeEnabled = !creativeEnabled;
+				
+				Tag data = main.findTagByName("Data");	
+				Tag creative = data.findTagByName("GameType");
+				data.removeSubTag(creative);
+				
+				
+				creative = new Tag(Tag.Type.TAG_Int, "GameType", (creativeEnabled) ? 1 : 0);
+				data.addTag(creative);
+				
+				//Enable the "Save" button
+				btnSave.setEnabled(true);
+			}
+			
+			//Save button pressed
+			if(cmd.equals("save"))
+			{
+				int chosen = JOptionPane.showConfirmDialog(frame, "Are you sure you want to overwrite your save file?", 
+						"Overwrite", JOptionPane.YES_NO_OPTION);
+				
+				if(chosen == JOptionPane.YES_OPTION);
+				{
+					try {
+						FileOutputStream fos = new FileOutputStream(new File(selectedFilePath));
+						main.writeTo(fos);
+						fos.close();
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						JOptionPane.showMessageDialog(null, "Problem saving file: File Not Found", "File Not Found", JOptionPane.ERROR_MESSAGE);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						JOptionPane.showMessageDialog(null, "Problem saving file: IO Error", "IO Error", JOptionPane.ERROR_MESSAGE);
+					}
+					
+					JOptionPane.showMessageDialog(frame, "File saved!");
+				}
+			}
+		} // else
 		
-	}
+	} //actionPerformed
 
 }
