@@ -2,6 +2,8 @@ Minecraft Save Seed Reader
 
 ------------------------------
 
+Check the GitHub wiki for more info!
+https://github.com/thedarkfreak/Minecraft-Save-Seed-Reader/wiki
 
 This program reads and displays the seed from all found minecraft Save files.   Just select a world's name from the dropdown list that shows up to get that world's seed.
 
