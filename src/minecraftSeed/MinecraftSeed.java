@@ -30,7 +30,7 @@ public class MinecraftSeed implements ActionListener {
 	private JButton btnSave;
 	private String selectedFilePath;
 	
-	private final Double version = 1.5;
+	private final Double version = 1.6;
 	
 	public MinecraftSeed()
 	{
@@ -78,6 +78,7 @@ public class MinecraftSeed implements ActionListener {
 		
 		text = new JTextField();
 		text.setColumns(20);
+		text.setEditable(false);
 		
 		
 		JMenuBar menuBar = new JMenuBar();
