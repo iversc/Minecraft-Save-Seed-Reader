@@ -65,9 +65,6 @@ public class Tag {
 	 * @param value an object that fits the tag type or a {@link Type} to create an empty TAG_List with this list type.
 	 */
 	public Tag(Type type, String name, Object value) {
-		if (type == Type.TAG_Compound)
-			if (!(value instanceof Tag[]))
-				throw new IllegalArgumentException();
 		switch (type) {
 		case TAG_End:
 			if (value != null)
@@ -137,6 +134,66 @@ public class Tag {
 
 	public Object getValue() {
 		return value;
+	}
+	
+	public void setValue(Object newValue)
+	{
+		switch (type) {
+		case TAG_End:
+			if (value != null)
+				throw new IllegalArgumentException();
+			break;
+		case TAG_Byte:
+			if (!(value instanceof Byte))
+				throw new IllegalArgumentException();
+			break;
+		case TAG_Short:
+			if (!(value instanceof Short))
+				throw new IllegalArgumentException();
+			break;
+		case TAG_Int:
+			if (!(value instanceof Integer))
+				throw new IllegalArgumentException();
+			break;
+		case TAG_Long:
+			if (!(value instanceof Long))
+				throw new IllegalArgumentException();
+			break;
+		case TAG_Float:
+			if (!(value instanceof Float))
+				throw new IllegalArgumentException();
+			break;
+		case TAG_Double:
+			if (!(value instanceof Double))
+				throw new IllegalArgumentException();
+			break;
+		case TAG_Byte_Array:
+			if (!(value instanceof byte[]))
+				throw new IllegalArgumentException();
+			break;
+		case TAG_String:
+			if (!(value instanceof String))
+				throw new IllegalArgumentException();
+			break;
+		case TAG_List:
+			if (value instanceof Type) {
+				this.listType = (Type) value;
+				value = new Tag[0];
+			} else {
+				if (!(value instanceof Tag[]))
+					throw new IllegalArgumentException();
+				this.listType = (((Tag[]) value)[0]).getType();
+			}
+			break;
+		case TAG_Compound:
+			if (!(value instanceof Tag[]))
+				throw new IllegalArgumentException();
+			break;
+		default:
+			throw new IllegalArgumentException();
+		}
+		
+		value = newValue;
 	}
 
 	public Type getListType() {

@@ -4,6 +4,15 @@ Version 1.6 -
 
 Made the Seed textbox read-only, so people don't try to change it with the program.
 
+Made the Save button disable after a press, so the world won't be saved again until
+another change is made.
+
+Updated the Tag class to allow editing of Tag values directly.
+
+Added the ability to toggle hardcore mode on 1.9+ worlds.
+
+Made the program more resilient against save corruption. Now, corrupted save files won't crash the program.
+
 ===============================================================
 Version 1.5 -
 ===============================================================

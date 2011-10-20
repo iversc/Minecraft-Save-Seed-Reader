@@ -23,14 +23,17 @@ public class MinecraftSeed implements ActionListener {
 	private JTextField text;
 	private String savePath;
 	private String[] filePaths;
+	private String lastFolder;
 	private int validNames;
-	private JComboBox combo;
+	private JComboBox<String> combo;
 	private JCheckBox cbCreative;
 	private boolean creativeEnabled;
+	private boolean hardcoreEnabled;
 	private JButton btnSave;
 	private String selectedFilePath;
 	
 	private final Double version = 1.6;
+	private JCheckBox cbHardcore;
 	
 	public MinecraftSeed()
 	{
@@ -73,7 +76,7 @@ public class MinecraftSeed implements ActionListener {
 		
 		panel = new JPanel();
 		
-		combo = new JComboBox();
+		combo = new JComboBox<String>();
 		combo.addActionListener(this);
 		
 		text = new JTextField();
@@ -103,7 +106,7 @@ public class MinecraftSeed implements ActionListener {
 		
 		menuBar.add(helpMenu);
 		frame.setJMenuBar(menuBar);
-		panel.setLayout(new MigLayout("", "[28px][166px][95px]", "[23px][]"));
+		panel.setLayout(new MigLayout("", "[28px][166px][95px]", "[23px][][]"));
 		
 		panel.add(combo, "cell 0 0,alignx left,aligny center");
 		panel.add(text, "cell 1 0 2 1,growx");
@@ -115,12 +118,19 @@ public class MinecraftSeed implements ActionListener {
 		cbCreative.addActionListener(this);
 		panel.add(cbCreative, "flowx,cell 1 1,alignx left,aligny top");
 		
+		cbHardcore = new JCheckBox("Hardcore Mode");
+		cbHardcore.setEnabled(false);
+		cbHardcore.setActionCommand("hardcoretoggle");
+		cbHardcore.addActionListener(this);
+		panel.add(cbHardcore, "cell 1 2");
+		
 		btnSave = new JButton("Save Changes");
 		btnSave.setEnabled(false);
 		btnSave.setActionCommand("save");
 		btnSave.addActionListener(this);
-		panel.add(btnSave, "cell 2 1");
+		panel.add(btnSave, "cell 2 2");
 		
+		//Try to load the save data
 		setupData();
 		
 		frame.pack();
@@ -186,6 +196,8 @@ public class MinecraftSeed implements ActionListener {
 					if(file.exists()) {
 						filePaths[validNames] = file.getPath();
 						
+						lastFolder = file.getParent();
+						
 						try {
 							fis = new FileInputStream(file);
 							main = Tag.readFrom(fis);
@@ -204,6 +216,12 @@ public class MinecraftSeed implements ActionListener {
 							e.printStackTrace();
 						} catch (IOException e) {
 							e.printStackTrace();
+						} catch (Exception e)
+						{
+							//Unknown problem with loading save file.  Corrupted?
+							JOptionPane.showMessageDialog(frame, "There was a problem reading the save file in " + lastFolder
+									+ ".\n It will not be loaded in this program.", "Error", JOptionPane.ERROR_MESSAGE);
+							continue;
 						}
 						
 						validNames++;
@@ -287,6 +305,7 @@ public class MinecraftSeed implements ActionListener {
 					if(creative==null)
 					{
 						cbCreative.setEnabled(false);
+						cbCreative.setSelected(false);
 					}
 					else
 					{
@@ -296,6 +315,23 @@ public class MinecraftSeed implements ActionListener {
 						creativeEnabled = ((Integer)creative.getValue() == 1);
 						cbCreative.setSelected(creativeEnabled);
 					}
+					
+					//Same as above, only with the "hardcore" toggle.
+					Tag hardcore = main.findTagByName("hardcore");
+					if(hardcore==null)
+					{
+						cbHardcore.setEnabled(false);
+						cbHardcore.setSelected(false);
+					}
+					else
+					{
+						cbHardcore.setEnabled(true);
+						
+						//Check the box if hardcore is enabled
+						hardcoreEnabled = ((Byte)hardcore.getValue() == 1);
+						cbHardcore.setSelected(hardcoreEnabled);
+					}
+					
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -341,21 +377,28 @@ public class MinecraftSeed implements ActionListener {
 				if(chooseSaveFolder()) setupData();
 			}
 			
-			//Checkbox checked
+			//Creative mode toggled
 			if(cmd.equals("creativetoggle"))
 			{
 				//File manipulation here
 				creativeEnabled = !creativeEnabled;
-				
-				Tag data = main.findTagByName("Data");	
-				Tag creative = data.findTagByName("GameType");
-				data.removeSubTag(creative);
-				
-				
-				creative = new Tag(Tag.Type.TAG_Int, "GameType", (creativeEnabled) ? 1 : 0);
-				data.addTag(creative);
+								
+				Tag creative = main.findTagByName("GameType");
+				creative.setValue(creativeEnabled ? 1 : 0);
 				
 				//Enable the "Save" button
+				btnSave.setEnabled(true);
+			}
+			
+			//Hardcore mode toggled
+			if(cmd.equals("hardcoretoggle"))
+			{
+				hardcoreEnabled = !hardcoreEnabled;
+				
+				Tag hardcore = main.findTagByName("hardcore");
+				hardcore.setValue((byte)(hardcoreEnabled? 1 : 0));
+				
+				//Enable the "save" button
 				btnSave.setEnabled(true);
 			}
 			
@@ -380,6 +423,8 @@ public class MinecraftSeed implements ActionListener {
 					}
 					
 					JOptionPane.showMessageDialog(frame, "File saved!");
+					
+					btnSave.setEnabled(false);
 				}
 			}
 		} // else

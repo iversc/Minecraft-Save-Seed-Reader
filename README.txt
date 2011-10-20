@@ -9,6 +9,8 @@ This program reads and displays the seed from all found minecraft Save files.   
 
 If the save file is a 1.8+ save file, you can switch the world between Creative and Survival mode by checking the box and hitting 'Save'.
 
+If the save file is a 1.9+ save file, you can toggle Hardcore mode on the save file on and off.
+
 If you do not see your save files, or if you get an error stating the saves aren't found, try locating the Minecraft saves folder manually, either in the popup or by opening the Help menu and choosing "Select MC Save Location".  You have to select the 'saves' folder, not any of the world folders in the 'saves' folder.
 
 
