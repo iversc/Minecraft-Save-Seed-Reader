@@ -1,3 +1,32 @@
+/*
+This software and it's source are distributed under the terms of the Modified BSD License, detailed below.
+
+Copyright (c) 2011, Christopher Iverson
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of the Minecraft Save Seed Reader team nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+*/
+
 package minecraftSeed;
 
 import java.awt.event.ActionEvent;
@@ -29,10 +58,14 @@ public class MinecraftSeed implements ActionListener {
 	private JCheckBox cbCreative;
 	private boolean creativeEnabled;
 	private boolean hardcoreEnabled;
+	private boolean abilitiesExist;     //To control tags added in Beta 1.9 PR 5.
+										//If these tags are not changed properly, Creative mode
+										//abilities can be enabled in Survival mode.
+	
 	private JButton btnSave;
 	private String selectedFilePath;
 	
-	private final Double version = 1.6;
+	private final String version = "1.6.1";
 	private JCheckBox cbHardcore;
 	
 	public MinecraftSeed()
@@ -70,7 +103,7 @@ public class MinecraftSeed implements ActionListener {
 			savePath = System.getProperty("user.home") + "/.minecraft/saves/";
 		}
 		
-		frame = new JFrame("Minecraft Save Seed Reader v" + version.toString());
+		frame = new JFrame("Minecraft Save Seed Reader v" + version);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		
@@ -332,6 +365,17 @@ public class MinecraftSeed implements ActionListener {
 						cbHardcore.setSelected(hardcoreEnabled);
 					}
 					
+					//The reason "Player" is also used here is to make sure we find the correct tag.
+					Tag abilities = main.findTagByName("Player").findTagByName("abilities");
+					if(abilities == null)
+					{
+						abilitiesExist = false;
+					}
+					else
+					{
+						abilitiesExist = true;
+					}
+					
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -366,7 +410,7 @@ public class MinecraftSeed implements ActionListener {
 								 "or send me an e-mail at cj.no.one@gmail.com.\n" +
 								 "\nEnjoy!";
 				
-				JOptionPane.showMessageDialog(panel, message, "About Minecraft Save Seed Reader v" + version.toString(),
+				JOptionPane.showMessageDialog(panel, message, "About Minecraft Save Seed Reader v" + version,
 						JOptionPane.INFORMATION_MESSAGE);
 			}
 			
@@ -385,6 +429,25 @@ public class MinecraftSeed implements ActionListener {
 								
 				Tag creative = main.findTagByName("GameType");
 				creative.setValue(creativeEnabled ? 1 : 0);
+				
+				if(abilitiesExist)
+				{
+					Tag abilities = main.findTagByName("Player").findTagByName("abilities");
+					
+					byte enabled = (byte)(creativeEnabled ? 1 : 0);		
+					
+					Tag temp = abilities.findTagByName("flying");
+					temp.setValue(enabled);
+					
+					temp = abilities.findTagByName("instabuild");
+					temp.setValue(enabled);
+					
+					temp = abilities.findTagByName("invulnerable");
+					temp.setValue(enabled);
+					
+					temp = abilities.findTagByName("mayfly");
+					temp.setValue(enabled);
+				}				
 				
 				//Enable the "Save" button
 				btnSave.setEnabled(true);

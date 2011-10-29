@@ -1,4 +1,13 @@
 ===============================================================
+Version 1.6.1 -
+===============================================================
+
+Update to support the new tags added to the MC save file in Beta 1.9 PR 5.
+
+If the tags are not handled properly, some Creative mode abilities can be 
+enabled in Survival mode.
+
+===============================================================
 Version 1.6 -
 ===============================================================
 
