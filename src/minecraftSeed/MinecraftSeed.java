@@ -65,7 +65,7 @@ public class MinecraftSeed implements ActionListener {
 	private JButton btnSave;
 	private String selectedFilePath;
 	
-	private final String version = "1.6.1";
+	private final String version = "1.6.2";
 	private JCheckBox cbHardcore;
 	
 	public MinecraftSeed()
@@ -367,14 +367,8 @@ public class MinecraftSeed implements ActionListener {
 					
 					//The reason "Player" is also used here is to make sure we find the correct tag.
 					Tag abilities = main.findTagByName("Player").findTagByName("abilities");
-					if(abilities == null)
-					{
-						abilitiesExist = false;
-					}
-					else
-					{
-						abilitiesExist = true;
-					}
+					
+					abilitiesExist = (abilities != null);
 					
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
