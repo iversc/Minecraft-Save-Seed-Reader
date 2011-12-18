@@ -387,7 +387,7 @@ public class MinecraftSeed implements ActionListener {
 								 "\nThe world's seed will show up in the textbox." + 
 								 "\n\nIf the list is empty, click on Help > Select MC Save Folder," +
 								 "\nand find and open the saves folder in the file chooser.\n" +
-								 "\nIf the save is a version 1.8+ save, you can switch the world" +
+								 "\nIf the save is a Beta 1.8+ save, you can switch the world" +
 								 "\nbetween Creative and Survival by checking the checkbox, then" +
 								 "\nhitting Save.";
 				
@@ -465,7 +465,7 @@ public class MinecraftSeed implements ActionListener {
 				int chosen = JOptionPane.showConfirmDialog(frame, "Are you sure you want to overwrite your save file?", 
 						"Overwrite", JOptionPane.YES_NO_OPTION);
 				
-				if(chosen == JOptionPane.YES_OPTION);
+				if(chosen == JOptionPane.YES_OPTION)
 				{
 					try {
 						FileOutputStream fos = new FileOutputStream(new File(selectedFilePath));
