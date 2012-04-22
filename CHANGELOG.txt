@@ -1,4 +1,12 @@
 ===============================================================
+Version 1.7 -
+===============================================================
+
+Added a toggle to enable/disable in-game single player commands, added in the 12w16a preview.
+
+Added a workaround for an issue with JComboBox and duplicate item names(in this case, duplicate world names)
+
+===============================================================
 Version 1.6.2 -
 ===============================================================
 

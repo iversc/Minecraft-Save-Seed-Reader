@@ -1,7 +1,7 @@
 /*
 This software and it's source are distributed under the terms of the Modified BSD License, detailed below.
 
-Copyright (c) 2011, Christopher Iverson
+Copyright (c) 2011-2012, Christopher Iverson
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -54,10 +54,11 @@ public class MinecraftSeed implements ActionListener {
 	private String[] filePaths;
 	private String lastFolder;
 	private int validNames;
-	private JComboBox<String> combo;
+	private JComboBox<Object> combo;
 	private JCheckBox cbCreative;
 	private boolean creativeEnabled;
 	private boolean hardcoreEnabled;
+	private boolean commandsEnabled;
 	private boolean abilitiesExist;     //To control tags added in Beta 1.9 PR 5.
 										//If these tags are not changed properly, Creative mode
 										//abilities can be enabled in Survival mode.
@@ -65,8 +66,9 @@ public class MinecraftSeed implements ActionListener {
 	private JButton btnSave;
 	private String selectedFilePath;
 	
-	private final String version = "1.6.2";
+	private final String version = "1.7";
 	private JCheckBox cbHardcore;
+	private JCheckBox cbCommands;
 	
 	public MinecraftSeed()
 	{
@@ -109,7 +111,7 @@ public class MinecraftSeed implements ActionListener {
 		
 		panel = new JPanel();
 		
-		combo = new JComboBox<String>();
+		combo = new JComboBox<Object>();
 		combo.addActionListener(this);
 		
 		text = new JTextField();
@@ -139,7 +141,7 @@ public class MinecraftSeed implements ActionListener {
 		
 		menuBar.add(helpMenu);
 		frame.setJMenuBar(menuBar);
-		panel.setLayout(new MigLayout("", "[28px][166px][95px]", "[23px][][]"));
+		panel.setLayout(new MigLayout("", "[28px][166px,grow][95px]", "[23px][][][]"));
 		
 		panel.add(combo, "cell 0 0,alignx left,aligny center");
 		panel.add(text, "cell 1 0 2 1,growx");
@@ -149,19 +151,25 @@ public class MinecraftSeed implements ActionListener {
 		cbCreative.setEnabled(false);
 		cbCreative.setActionCommand("creativetoggle");
 		cbCreative.addActionListener(this);
-		panel.add(cbCreative, "flowx,cell 1 1,alignx left,aligny top");
 		
 		cbHardcore = new JCheckBox("Hardcore Mode");
 		cbHardcore.setEnabled(false);
 		cbHardcore.setActionCommand("hardcoretoggle");
 		cbHardcore.addActionListener(this);
-		panel.add(cbHardcore, "cell 1 2");
+		panel.add(cbHardcore, "cell 1 1");
+		panel.add(cbCreative, "flowx,cell 2 1,alignx left,aligny top");
 		
 		btnSave = new JButton("Save Changes");
 		btnSave.setEnabled(false);
 		btnSave.setActionCommand("save");
 		btnSave.addActionListener(this);
-		panel.add(btnSave, "cell 2 2");
+		
+		cbCommands = new JCheckBox("Enable Commands");
+		cbCommands.setEnabled(false);
+		cbCommands.setActionCommand("commandstoggle");
+		cbCommands.addActionListener(this);
+		panel.add(cbCommands, "cell 1 2");
+		panel.add(btnSave, "cell 2 3");
 		
 		//Try to load the save data
 		setupData();
@@ -240,9 +248,9 @@ public class MinecraftSeed implements ActionListener {
 							//go by the folder's name
 							Tag name = main.findTagByName("LevelName");
 							if(name == null) {
-								combo.addItem(file.getParentFile().getName());
+								combo.addItem(makeObj(file.getParentFile().getName()));
 							} else {
-								combo.addItem((String)name.getValue());								
+								combo.addItem(makeObj((String)name.getValue()));	
 							}
 							
 						} catch (FileNotFoundException e) {
@@ -365,6 +373,19 @@ public class MinecraftSeed implements ActionListener {
 						cbHardcore.setSelected(hardcoreEnabled);
 					}
 					
+					Tag commands = main.findTagByName("allowCommands");
+					if(commands==null)
+					{
+						cbCommands.setEnabled(false);
+						cbCommands.setSelected(false);
+					}
+					else
+					{
+						cbCommands.setEnabled(true);
+						
+						commandsEnabled = ((Byte)commands.getValue() == 1);
+						cbCommands.setSelected(commandsEnabled);
+					}
 					//The reason "Player" is also used here is to make sure we find the correct tag.
 					Tag abilities = main.findTagByName("Player").findTagByName("abilities");
 					
@@ -459,6 +480,16 @@ public class MinecraftSeed implements ActionListener {
 				btnSave.setEnabled(true);
 			}
 			
+			if(cmd.equals("commandstoggle"))
+			{
+				commandsEnabled = !commandsEnabled;
+				
+				Tag commands = main.findTagByName("allowCommands");
+				commands.setValue((byte)(commandsEnabled? 1 : 0));
+				
+				btnSave.setEnabled(true);
+			}
+			
 			//Save button pressed
 			if(cmd.equals("save"))
 			{
@@ -487,5 +518,10 @@ public class MinecraftSeed implements ActionListener {
 		} // else
 		
 	} //actionPerformed
+	
+	private Object makeObj(final String item)  {
+		return new Object() { public String toString() { return item; } };
+	}
+
 
 }

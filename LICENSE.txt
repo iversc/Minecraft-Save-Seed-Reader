@@ -1,6 +1,6 @@
 This software and it's source are distributed under the terms of the Modified BSD License, detailed below.
 
-Copyright (c) 2011, Christopher Iverson
+Copyright (c) 2011-2012, Christopher Iverson
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
