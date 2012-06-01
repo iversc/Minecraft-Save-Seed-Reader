@@ -1,4 +1,12 @@
 ===============================================================
+Version 1.7.1 -
+===============================================================
+
+Changed the Creative mode checkbox to a combobox, to enable switching between Survival, Creative, and Adventure modes.
+
+Changed the flow of logic in some places to prevent some code from executing twice.
+
+===============================================================
 Version 1.7 -
 ===============================================================
 

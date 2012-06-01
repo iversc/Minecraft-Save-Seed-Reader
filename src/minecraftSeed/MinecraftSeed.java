@@ -55,20 +55,26 @@ public class MinecraftSeed implements ActionListener {
 	private String lastFolder;
 	private int validNames;
 	private JComboBox<Object> combo;
-	private JCheckBox cbCreative;
-	private boolean creativeEnabled;
 	private boolean hardcoreEnabled;
 	private boolean commandsEnabled;
 	private boolean abilitiesExist;     //To control tags added in Beta 1.9 PR 5.
 										//If these tags are not changed properly, Creative mode
 										//abilities can be enabled in Survival mode.
 	
+	private int gameType;
+	private int playerGameType;
+	private boolean usePGT;            //Stands for Use playerGameType.  Older saves didn't have this.
+	private boolean initSave;          //This flag is enabled when a save file is first loaded, and before it's been interacted with.
+									   //The main use for it is preventing the Gamemode combobox's action event from affecting data when first loaded.
 	private JButton btnSave;
 	private String selectedFilePath;
 	
-	private final String version = "1.7";
+	//private final Integer version = MinecraftSeed.makeVersion(1,7,1);
+	private final String version = "1.7.1";
 	private JCheckBox cbHardcore;
 	private JCheckBox cbCommands;
+	private JLabel lblGamemode;
+	private JComboBox<Object> cmbGamemode;
 	
 	public MinecraftSeed()
 	{
@@ -147,17 +153,8 @@ public class MinecraftSeed implements ActionListener {
 		panel.add(text, "cell 1 0 2 1,growx");
 		frame.getContentPane().add(panel);
 		
-		cbCreative = new JCheckBox("Creative Mode");
-		cbCreative.setEnabled(false);
-		cbCreative.setActionCommand("creativetoggle");
-		cbCreative.addActionListener(this);
-		
-		cbHardcore = new JCheckBox("Hardcore Mode");
-		cbHardcore.setEnabled(false);
-		cbHardcore.setActionCommand("hardcoretoggle");
-		cbHardcore.addActionListener(this);
-		panel.add(cbHardcore, "cell 1 1");
-		panel.add(cbCreative, "flowx,cell 2 1,alignx left,aligny top");
+		lblGamemode = new JLabel("Gamemode:");
+		panel.add(lblGamemode, "cell 0 1,alignx trailing");
 		
 		btnSave = new JButton("Save Changes");
 		btnSave.setEnabled(false);
@@ -168,7 +165,19 @@ public class MinecraftSeed implements ActionListener {
 		cbCommands.setEnabled(false);
 		cbCommands.setActionCommand("commandstoggle");
 		cbCommands.addActionListener(this);
-		panel.add(cbCommands, "cell 1 2");
+		
+		cbHardcore = new JCheckBox("Hardcore Mode");
+		cbHardcore.setEnabled(false);
+		cbHardcore.setActionCommand("hardcoretoggle");
+		cbHardcore.addActionListener(this);
+		
+		cmbGamemode = new JComboBox<Object>();
+		cmbGamemode.setEnabled(false);
+		cmbGamemode.setActionCommand("gamemode");
+		cmbGamemode.addActionListener(this);
+		panel.add(cmbGamemode, "cell 1 1 2 1,growx");
+		panel.add(cbHardcore, "cell 1 2");
+		panel.add(cbCommands, "cell 2 2");
 		panel.add(btnSave, "cell 2 3");
 		
 		//Try to load the save data
@@ -180,6 +189,11 @@ public class MinecraftSeed implements ActionListener {
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
+	
+	/*private static int makeVersion(int major, int minor, int rev)
+	{
+		return (major << (3*8)) + (minor << (2*8)) + rev;
+	}*/
 	
 	public static void main(String[] args) {
 
@@ -241,12 +255,12 @@ public class MinecraftSeed implements ActionListener {
 						
 						try {
 							fis = new FileInputStream(file);
-							main = Tag.readFrom(fis);
+							Tag temp = Tag.readFrom(fis);
 							fis.close();
 							
 							//If the level.dat doesn't have a 'LevelName' entry,
 							//go by the folder's name
-							Tag name = main.findTagByName("LevelName");
+							Tag name = temp.findTagByName("LevelName");
 							if(name == null) {
 								combo.addItem(makeObj(file.getParentFile().getName()));
 							} else {
@@ -269,10 +283,9 @@ public class MinecraftSeed implements ActionListener {
 					}
 				}
 				
-				if(validNames > 0) 
-				{
-					combo.setSelectedIndex(0);
-				} else { //No valid save files were found
+				if(validNames == 0) 
+			    { 
+					//No valid save files were found
 					JOptionPane.showMessageDialog(panel, "No valid save files were detected in current folder." +
 							"\n\nPlease choose a new one.", "Error", JOptionPane.ERROR_MESSAGE);
 					
@@ -337,66 +350,100 @@ public class MinecraftSeed implements ActionListener {
 					FileInputStream fis = new FileInputStream(new File(selectedFilePath));
 					main = Tag.readFrom(fis);
 					fis.close();
-					
-					text.setText(main.findTagByName("RandomSeed").getValue().toString());
-					
-					//Only if the save file has a 'GameType' entry will
-					//we allow the user to switch between Creative on and off.
-					Tag creative = main.findTagByName("GameType");
-					if(creative==null)
-					{
-						cbCreative.setEnabled(false);
-						cbCreative.setSelected(false);
-					}
-					else
-					{
-						cbCreative.setEnabled(true);
-						
-						//Check the box if creative is enabled
-						creativeEnabled = ((Integer)creative.getValue() == 1);
-						cbCreative.setSelected(creativeEnabled);
-					}
-					
-					//Same as above, only with the "hardcore" toggle.
-					Tag hardcore = main.findTagByName("hardcore");
-					if(hardcore==null)
-					{
-						cbHardcore.setEnabled(false);
-						cbHardcore.setSelected(false);
-					}
-					else
-					{
-						cbHardcore.setEnabled(true);
-						
-						//Check the box if hardcore is enabled
-						hardcoreEnabled = ((Byte)hardcore.getValue() == 1);
-						cbHardcore.setSelected(hardcoreEnabled);
-					}
-					
-					Tag commands = main.findTagByName("allowCommands");
-					if(commands==null)
-					{
-						cbCommands.setEnabled(false);
-						cbCommands.setSelected(false);
-					}
-					else
-					{
-						cbCommands.setEnabled(true);
-						
-						commandsEnabled = ((Byte)commands.getValue() == 1);
-						cbCommands.setSelected(commandsEnabled);
-					}
-					//The reason "Player" is also used here is to make sure we find the correct tag.
-					Tag abilities = main.findTagByName("Player").findTagByName("abilities");
-					
-					abilitiesExist = (abilities != null);
-					
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			}
+				
+				usePGT = false;
+				initSave = true;
+				cmbGamemode.removeAllItems();
+				cmbGamemode.addItem("Survival");
+				
+				
+				text.setText(main.findTagByName("RandomSeed").getValue().toString());
+
+
+				//Only if the save file has a 'GameType' entry will
+				//we allow the user to switch between Creative on and off.
+				Tag gametype = main.findTagByName("GameType");
+				if(gametype==null)
+				{
+					cmbGamemode.setEnabled(false);
+				}
+				else
+				{
+					cmbGamemode.setEnabled(true);
+					cmbGamemode.addItem("Creative");
+
+					gameType = (Integer)gametype.getValue();
+				}
+
+				//Same as above, only with the "hardcore" toggle.
+				Tag hardcore = main.findTagByName("hardcore");
+				if(hardcore==null)
+				{
+					cbHardcore.setEnabled(false);
+					cbHardcore.setSelected(false);
+				}
+				else
+				{
+					cbHardcore.setEnabled(true);
+
+					//Check the box if hardcore is enabled
+					hardcoreEnabled = ((Byte)hardcore.getValue() == 1);
+					cbHardcore.setSelected(hardcoreEnabled);
+				}
+
+				Tag commands = main.findTagByName("allowCommands");
+				if(commands==null)
+				{
+					cbCommands.setEnabled(false);
+					cbCommands.setSelected(false);
+				}
+				else
+				{
+					cbCommands.setEnabled(true);
+
+					commandsEnabled = ((Byte)commands.getValue() == 1);
+					cbCommands.setSelected(commandsEnabled);
+				}
+				
+				//The reason "Player" is also used here is to make sure we find the correct tag.
+				Tag abilities = main.findTagByName("Player").findTagByName("abilities");
+
+				abilitiesExist = (abilities != null);
+
+				if(abilitiesExist)
+				{
+					Tag mayBuild = abilities.findTagByName("mayBuild");
+					if(mayBuild != null)
+					{
+						cmbGamemode.addItem("Adventure");	
+					}
+				}
+				
+				Tag playerGameMode = main.findTagByName("Player").findTagByName("playerGameType");
+				if(playerGameMode != null)
+				{
+					usePGT = true;
+					
+					playerGameType = (Integer)playerGameMode.getValue();
+				} 
+				
+				initSave = true;
+				if(usePGT)
+				{
+					cmbGamemode.setSelectedIndex(playerGameType);
+				}
+				else
+				{
+					cmbGamemode.setSelectedIndex(gameType);
+				}
+
+			} // if (val > -1)
+			
 		} else { //One of the menu items was chosen, or the checkbox was checked,
 			     //or "save" was pressed
 			String cmd = arg0.getActionCommand();
@@ -436,37 +483,61 @@ public class MinecraftSeed implements ActionListener {
 				if(chooseSaveFolder()) setupData();
 			}
 			
-			//Creative mode toggled
-			if(cmd.equals("creativetoggle"))
+			//Game mode changed
+			if(cmd.equals("gamemode"))
 			{
-				//File manipulation here
-				creativeEnabled = !creativeEnabled;
-								
-				Tag creative = main.findTagByName("GameType");
-				creative.setValue(creativeEnabled ? 1 : 0);
-				
-				if(abilitiesExist)
+				if (cmbGamemode.getSelectedIndex() > -1) 
 				{
-					Tag abilities = main.findTagByName("Player").findTagByName("abilities");
 					
-					byte enabled = (byte)(creativeEnabled ? 1 : 0);		
-					
-					Tag temp = abilities.findTagByName("flying");
-					temp.setValue(enabled);
-					
-					temp = abilities.findTagByName("instabuild");
-					temp.setValue(enabled);
-					
-					temp = abilities.findTagByName("invulnerable");
-					temp.setValue(enabled);
-					
-					temp = abilities.findTagByName("mayfly");
-					temp.setValue(enabled);
-				}				
-				
-				//Enable the "Save" button
-				btnSave.setEnabled(true);
+					if (!initSave) {
+						gameType = cmbGamemode.getSelectedIndex();
+						Tag gamemode = main.findTagByName("GameType");
+						gamemode.setValue(gameType);
+						
+						if (usePGT) {
+							playerGameType = gameType;
+							Tag pgt = main.findTagByName("Player").findTagByName("playerGameType");
+							pgt.setValue(playerGameType);
+						}
+						//Enable/disable all special abilities depending on selection.
+						//while "Flying" is only used by the game to indicate whether or not the player is currently flying,
+						//it is toggled here to make sure a player can't remain flying when Creative is turned off.
+						if (abilitiesExist) {
+							Tag abilities = main.findTagByName("Player")
+									.findTagByName("abilities");
+
+							Tag temp;
+
+							byte enable = (byte) ((gameType == 1) ? 1 : 0);
+
+							temp = abilities.findTagByName("instabuild");
+							temp.setValue(enable);
+
+							temp = abilities.findTagByName("invulnerable");
+							temp.setValue(enable);
+
+							temp = abilities.findTagByName("mayfly");
+							temp.setValue(enable);
+
+							temp = abilities.findTagByName("flying");
+							temp.setValue(enable);
+
+							enable = (byte) ((gameType == 2) ? 1 : 0);
+
+							temp = abilities.findTagByName("mayBuild");
+							if (temp != null)
+								temp.setValue(enable);
+						}
+						//Enable the "Save" button
+						btnSave.setEnabled(true);
+					} //if(!initSave)
+					else
+					{
+						initSave = false;
+					}
+				}
 			}
+			
 			
 			//Hardcore mode toggled
 			if(cmd.equals("hardcoretoggle"))
