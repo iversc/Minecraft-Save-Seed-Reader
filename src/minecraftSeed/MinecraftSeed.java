@@ -70,7 +70,7 @@ public class MinecraftSeed implements ActionListener {
 	private String selectedFilePath;
 	
 	//private final Integer version = MinecraftSeed.makeVersion(1,7,1);
-	private final String version = "1.7.1";
+	private final String version = "1.7.2";
 	private JCheckBox cbHardcore;
 	private JCheckBox cbCommands;
 	private JLabel lblGamemode;
@@ -161,7 +161,7 @@ public class MinecraftSeed implements ActionListener {
 		btnSave.setActionCommand("save");
 		btnSave.addActionListener(this);
 		
-		cbCommands = new JCheckBox("Enable Commands");
+		cbCommands = new JCheckBox("Enable Cheats");
 		cbCommands.setEnabled(false);
 		cbCommands.setActionCommand("commandstoggle");
 		cbCommands.addActionListener(this);
