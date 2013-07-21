@@ -34,6 +34,7 @@ import java.awt.event.ActionListener;
 import java.io.*;
 
 import javax.swing.*;
+
 import net.miginfocom.swing.MigLayout;
 
 class DirFilter implements FilenameFilter {
@@ -243,6 +244,18 @@ public class MinecraftSeed implements ActionListener {
 				FileInputStream fis;
 		
 				combo.removeAllItems();
+
+				File CSVFile = new File(savePath + File.separator + "seeds.csv");
+				String worldName;
+				
+				PrintStream CSVOut = null;
+				try {
+					CSVOut = new PrintStream(CSVFile);
+				} catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
 				for(String s : tempPaths)
 				{
 					//Check each sub-directory for a 'level.dat' file
@@ -261,11 +274,21 @@ public class MinecraftSeed implements ActionListener {
 							//If the level.dat doesn't have a 'LevelName' entry,
 							//go by the folder's name
 							Tag name = temp.findTagByName("LevelName");
+							
+							
+							
 							if(name == null) {
 								combo.addItem(makeObj(file.getParentFile().getName()));
+								worldName = file.getParentFile().getName();
 							} else {
-								combo.addItem(makeObj((String)name.getValue()));	
+								combo.addItem(makeObj((String)name.getValue()));
+								worldName = (String)name.getValue();
 							}
+							
+							String seed = temp.findTagByName("RandomSeed").getValue().toString();
+							
+							if(CSVOut!=null) CSVOut.println(worldName + "," + seed);
+							
 							
 						} catch (FileNotFoundException e) {
 							e.printStackTrace();
@@ -281,7 +304,10 @@ public class MinecraftSeed implements ActionListener {
 						
 						validNames++;
 					}
+					
 				}
+				
+				if(CSVOut!=null) CSVOut.close();
 				
 				if(validNames == 0) 
 			    { 
