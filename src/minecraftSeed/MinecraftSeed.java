@@ -287,7 +287,7 @@ public class MinecraftSeed implements ActionListener {
 							
 							String seed = temp.findTagByName("RandomSeed").getValue().toString();
 							
-							if(CSVOut!=null) CSVOut.println(worldName + "," + seed);
+							if(CSVOut!=null) CSVOut.println("\"" + worldName + "\"," + seed);
 							
 							
 						} catch (FileNotFoundException e) {
