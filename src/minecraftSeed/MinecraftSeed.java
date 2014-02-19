@@ -410,27 +410,36 @@ public class MinecraftSeed implements ActionListener {
 					cbCommands.setSelected(commandsEnabled);
 				}
 				
-				//The reason "Player" is also used here is to make sure we find the correct tag.
-				Tag abilities = main.findTagByName("Player").findTagByName("abilities");
-
-				abilitiesExist = (abilities != null);
-
-				if(abilitiesExist)
-				{
-					Tag mayBuild = abilities.findTagByName("mayBuild");
-					if(mayBuild != null)
-					{
-						cmbGamemode.addItem("Adventure");	
-					}
-				}
+				Tag player = main.findTagByName("Player");
 				
-				Tag playerGameMode = main.findTagByName("Player").findTagByName("playerGameType");
-				if(playerGameMode != null)
+				//The reason "Player" is also used here is to make sure we find the correct tag.
+				//Player tag is separated to handle the case that a player tag doesn't exist in the save file.
+				if(player != null)
 				{
-					usePGT = true;
+					Tag abilities = player.findTagByName("abilities");
+					abilitiesExist = (abilities != null);
+
+					if(abilitiesExist)
+					{
+						Tag mayBuild = abilities.findTagByName("mayBuild");
+						if(mayBuild != null)
+						{
+							cmbGamemode.addItem("Adventure");	
+						}
+					}
 					
-					playerGameType = (Integer)playerGameMode.getValue();
+					Tag playerGameMode = player.findTagByName("playerGameType");
+					if(playerGameMode != null)
+					{
+						usePGT = true;
+						playerGameType = (Integer)playerGameMode.getValue();
+					}
 				} 
+				else  //if(player != null)
+				{
+					abilitiesExist = false;
+					usePGT = false;
+				}
 				
 				initSave = true;
 				if(usePGT)
