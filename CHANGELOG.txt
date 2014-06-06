@@ -1,8 +1,17 @@
 ===============================================================
+Version 1.7.3 - 
+===============================================================
+
+Refactoring.  
+
+Got rid of the DirFilter private class.  Only used in one instance, replaced with an anonymous class.
+
+
+===============================================================
 Version 1.7.2 - 
 ===============================================================
 
-Changed "Enable commands" to "enable cheats", as some commands are still accessable in single player.
+Changed "Enable commands" to "enable cheats", as some commands are still accessible in single player.
 
 Fixed issue #3, TAG_Int_Array is now implemented
 

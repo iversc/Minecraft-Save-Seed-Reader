@@ -36,14 +36,6 @@ import java.io.*;
 import javax.swing.*;
 import net.miginfocom.swing.MigLayout;
 
-class DirFilter implements FilenameFilter {
-
-	@Override
-	public boolean accept(File dir, String name) {
-		return new File(dir.getPath() + File.separator + name).isDirectory();
-	}
-	
-}
 
 public class MinecraftSeed implements ActionListener {
 	private Tag main;
@@ -70,7 +62,7 @@ public class MinecraftSeed implements ActionListener {
 	private String selectedFilePath;
 	
 	//private final Integer version = MinecraftSeed.makeVersion(1,7,1);
-	private final String version = "1.7.2";
+	private final String version = "1.7.3";
 	private JCheckBox cbHardcore;
 	private JCheckBox cbCommands;
 	private JLabel lblGamemode;
@@ -236,7 +228,12 @@ public class MinecraftSeed implements ActionListener {
 			if(file.exists())
 			{
 				//Grab a list of sub-directories in the saves directory
-				String[] tempPaths = file.list(new DirFilter());
+				
+				String [] tempPaths = file.list(new FilenameFilter() {
+					public boolean accept(File dir, String name) {
+						return new File(dir.getPath() + File.separator + name).isDirectory();
+					}
+				});
 				filePaths = new String[tempPaths.length];
 		
 				validNames = 0;
