@@ -32,6 +32,7 @@ package minecraftSeed;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.nio.file.*;
 
 import javax.swing.*;
 import net.miginfocom.swing.MigLayout;
@@ -62,7 +63,7 @@ public class MinecraftSeed implements ActionListener {
 	private String selectedFilePath;
 	
 	//private final Integer version = MinecraftSeed.makeVersion(1,7,1);
-	private final String version = "1.7.3";
+	private final String version = "1.7.4";
 	private JCheckBox cbHardcore;
 	private JCheckBox cbCommands;
 	private JLabel lblGamemode;
@@ -310,13 +311,16 @@ public class MinecraftSeed implements ActionListener {
 			
 			//Three tests to see if the folder chosen was a world folder, not the saves folder
 			//Test one: check for existence of 'level.dat'
-			if((new File(savePath + File.separator + "level.dat")).exists())
+			//if((new File(savePath + File.separator + "level.dat")).exists())
+			if(Files.exists(Paths.get(savePath + File.separator + "level.dat")))
 			{
 				//'level.dat' exists, now check for 'session.lock'
-				if((new File(savePath + File.separator + "session.lock")).exists())
+				//if((new File(savePath + File.separator + "session.lock")).exists())
+				if(Files.exists(Paths.get(savePath + File.separator + "session.lock")))
 				{
 					//'session.lock' exists, now the final check: region subfolder.
-					if((new File(savePath + File.separator + "region")).exists())
+					//if((new File(savePath + File.separator + "region")).exists())
+					if(Files.exists(Paths.get(savePath + File.separator + "region")))
 					{
 						//At this point, we've almost indisputably gotten a world folder instead
 						//of the saves folder.  Let's set 'savePath' to the parent directory.
